@@ -162,6 +162,20 @@ class InstagramChecker:
                 status, body, retry_after = outcome
                 latency = (time.perf_counter() - started) * 1000
                 check_status = classify_response(status, body)
+                if check_status is CheckStatus.UNKNOWN and status == 200:
+                    # Log marker presence only; never record page HTML or credentials.
+                    sample = body or ""
+                    logger.warning(
+                        "Unclassified response for %s: chars=%d title=%s "
+                        "profile=%s not_found=%s login_wall=%s meta=%s",
+                        username,
+                        len(sample),
+                        bool(GENERIC_TITLE_RE.search(sample)),
+                        any(marker in sample for marker in PROFILE_INDICATORS),
+                        any(marker in sample for marker in NOT_FOUND_INDICATORS),
+                        any(marker in sample for marker in LOGIN_WALL_INDICATORS),
+                        bool(PROFILE_META_RE.search(sample)),
+                    )
 
                 if check_status is CheckStatus.RATE_LIMITED:
                     pause = self._limiter.record_rate_limited(retry_after)
