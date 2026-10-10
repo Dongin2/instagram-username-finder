@@ -1,0 +1,33 @@
+name: Offline username candidates
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "Candidate offset (use 100, 200, etc. for new batches)"
+        default: "0"
+      count:
+        description: "Number of candidates"
+        default: "100"
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate candidates offline
+        env:
+          START: ${{ inputs.start }}
+          COUNT: ${{ inputs.count }}
+        run: python tools/candidate_generator.py --start "$START" --count "$COUNT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: username-candidates-${{ github.run_id }}
+          path: data/candidates.csv
+          retention-days: 30
