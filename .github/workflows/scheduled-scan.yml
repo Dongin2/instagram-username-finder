@@ -16,10 +16,10 @@ on:
         default: "4"
       charset:
         description: "letters | digits | letters_digits | instagram"
-        default: "letters"
+        default: "letters_digits"
       max_checks:
         description: "Hard cap on usernames checked in this run"
-        default: "500"
+        default: "200"
       time_limit:
         description: "Hard cap in seconds for this run"
         default: "900"
@@ -49,8 +49,8 @@ jobs:
     env:
       MIN_LENGTH: ${{ inputs.min_length || '4' }}
       MAX_LENGTH: ${{ inputs.max_length || '4' }}
-      CHARSET: ${{ inputs.charset || 'letters' }}
-      MAX_CHECKS: ${{ inputs.max_checks || '500' }}
+      CHARSET: ${{ inputs.charset || 'letters_digits' }}
+      MAX_CHECKS: ${{ inputs.max_checks || '200' }}
       TIME_LIMIT: ${{ inputs.time_limit || '900' }}
       # Conservative pacing: a scheduled scan has all the time in the world.
       USERNAME_FINDER_CONCURRENCY: "3"
@@ -67,7 +67,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
-          elif [ "${{ vars.ENABLE_SCHEDULED_SCAN }}" = "true" ]; then
+          elif [ "${{ vars.ENABLE_SCHEDULED_SCAN }}" != "false" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "Scheduled scanning is disabled (set the ENABLE_SCHEDULED_SCAN variable to enable)."
