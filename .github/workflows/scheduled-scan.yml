@@ -67,7 +67,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
-          elif [ "${{ vars.ENABLE_SCHEDULED_SCAN }}" != "false" ]; then
+          elif [ "${{ vars.ENABLE_SCHEDULED_SCAN }}" = "true" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "Scheduled scanning is disabled (set the ENABLE_SCHEDULED_SCAN variable to enable)."
